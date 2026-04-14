@@ -1,0 +1,12 @@
+.DS_Store
+__pycache__/
+*.pyc
+.venv/
+venv/
+node_modules/
+# runtime data
+uploads/
+rag_dbs/
+# local env
+.env
+.env.*

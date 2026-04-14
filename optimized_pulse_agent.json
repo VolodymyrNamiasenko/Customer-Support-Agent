@@ -1,0 +1,145 @@
+{
+  "generate_answer.predict": {
+    "traces": [],
+    "train": [],
+    "demos": [
+      {
+        "augmented": true,
+        "context": "You are a Business Process Expert for a manufacturing ERP system. You answer questions about Technical Data Sheets (TDS) and Order Technical Data Sheets (Order TDS) based on user manuals and business blueprints. Provide precise, factual answers.",
+        "history_summary": "",
+        "question": "Who can create, read, update, and delete a standard TDS?",
+        "reasoning": "Check integration status, then analyze.",
+        "answer": "According to the standard TDS documentation, the following roles have access to create, read, update, and delete a standard TDS:\n- **Authorized Technical Engineers**: They can create, read, update, and delete a standard TDS.\n- **IT Support**: They can create, read, update, and delete a standard TDS.\n- **Authorized Users**: They can read a standard TDS.\n\nNote that the user manual explicitly states that users without the required permissions will not be able to perform these actions."
+      },
+      {
+        "augmented": true,
+        "context": "You are a Business Process Expert specializing in manufacturing planning systems. You answer questions using your knowledge of User Manuals and Business Blueprints, with the Blueprint taking precedence when conflicts arise.",
+        "history_summary": "",
+        "question": "What inputs does the RCCP engine require to run?",
+        "reasoning": "Check integration status, then analyze.",
+        "answer": "The RCCP engine requires the following inputs to run:\n- A valid Production Schedule\n- A valid Resource Allocation Plan\n- A valid Bill of Materials (BOM) for the production order\n- A valid Material Requirements Plan (MRP) for the production order\n- A valid Order Technical Data Sheet (Order TDS) for the production order\n\nThese inputs are necessary to ensure that the production order can be successfully executed and that the production schedule and resource allocation plan are feasible."
+      },
+      {
+        "augmented": true,
+        "context": "You are a Business Process Expert for an IIoT-based manufacturing platform. You answer questions by reasoning across User Manuals and Business Blueprints. When referencing processes, be precise about navigation paths, roles, and system behavior.",
+        "history_summary": "",
+        "question": "What are the four main sections of the Status monitor page used for Historical dashboards?",
+        "reasoning": "Check integration status, then analyze.",
+        "answer": "The Status monitor page has four main sections used for Historical dashboards. These sections are:\n1. **Production Status**: Displays the current production status, including production rates, yield rates, and any production issues.\n2. **Production History**: Shows a historical view of production activities, including start and end times, production quantities, and any notable events.\n3. **Equipment Status**: Displays the current status of equipment, including any issues or maintenance required.\n4. **Quality Status**: Displays the current quality status, including any defects or quality issues."
+      },
+      {
+        "augmented": true,
+        "context": "You are a Business Process Expert specializing in manufacturing material master data management. You answer questions precisely using information from User Manuals and Business Blueprints. When conflicts exist between a User Manual and a Blueprint, you prioritize the Blueprint logic.",
+        "history_summary": "",
+        "question": "Based on the following excerpt from the User Manual, answer my question.\n\n---CONTEXT START---\nFinally, user can download excel file which contains the created FG item code and SFG Item codes along with the marketing data required to be sent to SAP using Download Excel button at the top of the screen. (this step can be done for one FG item line or for multiple lines selected at the same time)\n---CONTEXT END---\n\nCan the Excel download be done for multiple FG items at once?",
+        "reasoning": "Check integration status, then analyze.",
+        "answer": "According to the User Manual excerpt, the Excel download can be done for multiple FG items at once. The Download Excel button at the top of the screen allows users to select multiple FG item lines and download the required data, including FG item codes and marketing data, in a single Excel file."
+      },
+      {
+        "question": "The Digital Logbook was mentioned during the training. How does it relate to the MES dashboards?",
+        "context": "You are a Business Process Expert for an MES (Manufacturing Execution System) deployed in a cable manufacturing facility. You answer questions by reasoning across User Manuals, Business Blueprints, and training documentation. For complex questions, show your step-by-step reasoning process.",
+        "reasoning": "1. Search for references to the Digital Logbook in the training transcript.\n2. Context found: The Digital Logbook was referenced as a tool to verify and cross-reference dashboard data. It was described as a 'very helpful and handy tool in order to check or link the report itself that is presented to you right now with what was happening during these days.'\n3. Additional detail: The Digital Logbook has a default filter showing the last 48 hours of data, which can be cleared to show all historical data. It is accessed from the Manufacturing menu.\n4. Determine the relationship: The Digital Logbook serves as an operational audit trail that provides granular, event-level data. The MES dashboards aggregate this data into summary views. Users can cross-reference dashboard metrics with the logbook to understand the underlying events.",
+        "answer": "The Digital Logbook is a complementary tool to the MES dashboards. While dashboards show aggregated metrics (output, performance, hours comparison), the Digital Logbook provides a detailed, event-level record of what occurred on each machine. It serves as a verification and audit tool — when a dashboard metric appears unexpected, users can check the Digital Logbook to understand the specific events that produced those numbers. It defaults to showing the last 48 hours but can be filtered to any date range."
+      },
+      {
+        "question": "The User Manual states: 'Manufacturing engineers have full access (create, read, update, delete) to work centers.' But the Blueprint says: 'Administrator, IT Support, and Manufacturing Engineer can create, read, and update work centers. Deletion rights are not granted to Manufacturing Engineer.' Which is correct?",
+        "context": "You are a Business Process Expert for the Pulse Digital MES (Manufacturing Execution System) implementation at Alfanar Cable Factory. You reason across User Manuals and Business Blueprints to answer questions about master data management, system navigation, entity configuration, and manufacturing processes. Always prioritize Blueprint logic when conflicts arise.",
+        "reasoning": "Check integration status, then analyze.",
+        "answer": "Manual states manufacturing engineers have full CRUD access to work centers, but Blueprint requires that manufacturing engineers can create, read, and update but cannot delete work centers. Following the Blueprint, we must restrict deletion rights for the Manufacturing Engineer user group.\n\nThe system is already configured to enforce this — if a manufacturing engineer attempts to delete a work center, they will receive an 'Access Denied' message. Only Administrator and IT Support have deletion rights for work centers. The User Manual contains an error and should be corrected to match the Blueprint. This restriction protects against accidental deletion of work centers that may have active production orders, routing references, or historical data linked to them."
+      },
+      {
+        "question": "The Business Blueprint requires that the Technical Engineer must configure Material Classes using a change request (CR) workflow with version control, whereas the User Manual allows direct editing of Material Classes without any change management process. Which approach should we adopt?",
+        "context": "You are a Business Process Expert specializing in manufacturing material master data management. You answer questions precisely using information from User Manuals and Business Blueprints. When conflicts exist between a User Manual and a Blueprint, you prioritize the Blueprint logic.",
+        "reasoning": "Check integration status, then analyze.",
+        "answer": "The User Manual describes direct configuration of Material Classes — the Technical Engineer can freely add, edit, and delete characteristics, operations, and classes through the UI without any formal change management steps. However, the Business Blueprint requires a change request (CR) workflow with version control for all Material Classes modifications. Following the Blueprint, we must implement a CR workflow where every modification to Material Classes (adding characteristics, changing sort orders, adding item categories, etc.) is submitted as a formal change request, reviewed, approved, and version-controlled before taking effect in the system. The Blueprint approach ensures traceability, prevents unauthorized changes to the product taxonomy, and maintains an audit history of all configuration modifications — which is critical for quality management and regulatory compliance."
+      },
+      {
+        "question": "The Business Blueprint for cable manufacturing specifies six operations for SFG items (adding 'Jacketing' as a 6th operation after Screening), while the User Manual only lists five operations ending with Screening. Which operation sequence should we configure?",
+        "context": "You are a Business Process Expert specializing in manufacturing material master data management. You answer questions precisely using information from User Manuals and Business Blueprints. When conflicts exist between a User Manual and a Blueprint, you prioritize the Blueprint logic.",
+        "reasoning": "Check integration status, then analyze.",
+        "answer": "The User Manual lists five SFG operations: (1) Wire drawing, (2) Stranding, (3) Insulation, (4) Assembly, and (5) Screening, noting the list continues with 'and so on.' However, the Business Blueprint explicitly defines six operations, adding Jacketing as the 6th operation after Screening. Following the Blueprint, we must configure all six operations in the Operations tab of Material Classes, including Jacketing with its specific characteristics. The User Manual's use of 'and so on' after the 5th operation indicates its list was illustrative rather than exhaustive, which further supports adopting the Blueprint's complete and authoritative operation sequence. The Jacketing operation and its associated characteristics must be fully configured in Pulse Digital before any SFG codes requiring that operation level can be generated."
+      },
+      {
+        "question": "Based on the following excerpt:\n\n\"We should differentiate it like the statuses of the orders, if this orders are just planned or included to the monthly plan, if these orders are aggregated, and still any changes are applicable to this aggregation. If these orders are released as job orders to the operators, and if production is already started. And, if it is started, on which stage is production.\"\n\nWhat are the different order status levels that determine whether a mid-month change is permissible?",
+        "context": "You are a Business Process Expert for supply chain and production planning in a cable manufacturing environment. You answer questions precisely using documented business processes, blueprints, and user manuals related to monthly planning, RCCP, MTS/MTO order management, and production scheduling.",
+        "reasoning": "Check integration status, then analyze.",
+        "answer": "Based on the provided excerpt, there are five order status levels that determine the permissibility and complexity of mid-month changes:\n\n1. Planned — the order is recognized in the system but not yet included in the monthly plan. Changes are fully permissible at this stage.\n\n2. Included in monthly plan — the order has been allocated in the released monthly plan. Changes are permissible but require capacity re-evaluation.\n\n3. Aggregated — the order has been combined with other orders into optimized batches for production. Changes are more restricted; additions should be handled as separate lines to avoid disrupting the aggregated structure.\n\n4. Released as job order — the order has been assigned to specific operators and machines on the shop floor. Changes require planning team confirmation and are significantly more complex.\n\n5. Production started — manufacturing is underway. The permissibility of changes depends on the specific production stage (conductor, insulation, assembly, sheathing, etc.) and whether produced semi-finished goods can be reallocated to other orders.\n\nThe further along this status progression, the more constrained and costly changes become."
+      },
+      {
+        "question": "I want to compare two planning scenarios for next quarter. What process should I follow and who needs to be involved?",
+        "context": "You are a Business Process Expert specializing in manufacturing planning systems. You answer questions using your knowledge of User Manuals and Business Blueprints, with the Blueprint taking precedence when conflicts arise.",
+        "reasoning": "1. Analyze the intent: The user wants to run and compare two different planning scenarios and needs to know the process and stakeholder involvement.\n2. Identify relevant document: The 'Different Planning Scenarios Simulations' section of the RCCP Blueprint covers this process, including the RACI matrix.\n3. Trace the full process and RACI: The Blueprint defines six steps and specifies roles for Planning, Manufacturing, Sales, and Supply Chain teams.\n4. Compile the complete answer.",
+        "answer": "You should follow the 'Different Planning Scenarios Simulations' process. The steps are: (1) The Planning Team initiates a request for monthly plan estimation. (2) Select relevant Manufacturing Orders for replanning — the Planning Team is Responsible, while Manufacturing, Sales, and Supply Chain teams are Consulted. (3) Select the first scenario and perform RCCP — the Planning Team is solely Responsible. (4) Save the plan snapshot — Planning is Responsible; Manufacturing, Sales, and Supply Chain are Informed. (5) Review the plan snapshot — Planning is Responsible; the other three teams are Consulted. (6) Notify stakeholders of the results — Planning is Responsible; others are Informed. Repeat steps 3–5 for the second scenario, then compare both snapshots. This gives you documented, comparable plan snapshots for decision-making."
+      },
+      {
+        "question": "The User Manual says Manufacturing Orders can be added to the production schedule at any approval stage. The Blueprint says only orders that have passed all required approval stages are included in the approved portfolio and scheduled. Which rule applies?",
+        "context": "You are a Business Process Expert specializing in manufacturing planning systems. You answer questions using your knowledge of User Manuals and Business Blueprints, with the Blueprint taking precedence when conflicts arise.",
+        "reasoning": "Check integration status, then analyze.",
+        "answer": "The User Manual says Manufacturing Orders can be added to the production schedule at any approval stage, but the Blueprint clearly states that the approved portfolio of orders is a list of orders that have passed all the required approval stages, and only these orders have their items included in the production schedule. Following the Blueprint, we must ensure that only fully approved Manufacturing Orders enter the RCCP production schedule. RCCP books resources (work centers and raw materials) for these approved orders. Allowing partially approved orders into the schedule would create resource conflicts, inaccurate capacity calculations, and unreliable capable-to-promise dates. The User Manual must be corrected to enforce full approval before schedule inclusion as specified in the Blueprint."
+      },
+      {
+        "question": "I have the following snippet from the blueprint:\n\n\"Duplicate material validation: when a material type attribute is defined in TDS for a specific operation, and the same material is selected again for a different field, the system shows a warning message stating 'This component is already defined.' The user receives a confirmation prompt before proceeding. This allows the system to flag potential duplicates while still permitting intentional reuse of the same material across different operations.\"\n\nBased on this snippet only, how does the system handle duplicate material selection in TDS?",
+        "context": "You are a Business Process Expert for a manufacturing ERP system. You answer questions about Technical Data Sheets (TDS) and Order Technical Data Sheets (Order TDS) based on user manuals and business blueprints. Provide precise, factual answers.",
+        "reasoning": "Check integration status, then analyze.",
+        "answer": "Based on the provided snippet, when a material is selected that has already been defined in another field within the same TDS, the system displays a warning message stating 'This component is already defined.' The user then receives a confirmation prompt. This design does not block the selection entirely — instead, it flags the potential duplicate and asks the user to confirm whether they intentionally want to use the same material in a different field. This approach balances data integrity (preventing accidental duplicates) with flexibility (allowing intentional reuse of the same material across different operations when the business process requires it)."
+      },
+      {
+        "question": "A regional IT support technician accidentally created a duplicate currency entry for USD in PulseDigital — there are now two entries with slightly different names. What is the correct remediation procedure, and who can carry it out?",
+        "context": "You are a Business Process Expert with deep knowledge of PulseDigital MDM modules, SAP integration blueprints, and enterprise master data governance. For complex questions, reason through the problem step by step before giving your final answer. Structure your thinking as: Thinking Process: 1. [Analyze intent] 2. [Identify document] 3. [Check for conflicts] Conclusion: [Final answer]",
+        "reasoning": "1. Analyze intent: The user needs to understand how to remove a duplicate currency record and who has the authority to do so.\n2. Identify document: The Currencies User Manual is the governing document. It states that Currencies is a Manual entry type entity with full CRUD rights for both Administrators and IT Support. The system requires currency codes to be unique (per ISO 4217), but the scenario suggests two records exist with slight name differences — meaning the code uniqueness check may not have caught the duplicate.\n3. Check for conflicts: No conflict between documents. The manual is clear on access rights. The resolution is straightforward: identify the erroneous record and delete it.",
+        "answer": "The remediation should be performed by either an Administrator or an IT Support user, as both roles have Delete rights on the Currencies directory. The correct steps are: (1) Navigate to System Administration → MDM → Main Directories → Currencies → Currency Directory; (2) Identify the two USD entries and determine which is the canonical record (correct Designation 'In system', correct Name 'General', and ISO 4217 codes: character code 'USD', digital code '840'); (3) Before deleting the duplicate, verify whether either record has been used in any transaction — if so, refer to financial controls policy before proceeding with deletion; (4) Delete the erroneous duplicate entry; (5) Confirm only one USD record remains. To prevent recurrence, the team should establish a naming and code validation checklist for all new currency entries."
+      },
+      {
+        "question": "What information is displayed in the Events tab of Actual availability?",
+        "context": "You are a Business Process Expert for an IIoT-based manufacturing platform. You answer questions by reasoning across User Manuals and Business Blueprints. When referencing processes, be precise about navigation paths, roles, and system behavior.",
+        "reasoning": "Check integration status, then analyze.",
+        "answer": "The Events tab displays a log of all automatic events captured by the system for each connected machine. Each event record includes the following fields: Operating code center (the work center or machine internal system code), Event name (the machine status such as Running/Run time, Offline/No Connection, Small Stop, or Downtime), Started (starting time and date of the event), Completed (end time and date), Duration (total duration of the captured event), Production (length produced during the event), and Speed (machine speed during the captured event)."
+      },
+      {
+        "question": "What are the three main time-based views available on the Machines Output Dashboard?",
+        "context": "You are a Business Process Expert for an MES (Manufacturing Execution System) deployed in a cable manufacturing facility. You answer questions by reasoning across User Manuals, Business Blueprints, and training documentation. Always be precise and cite the relevant document or process.",
+        "reasoning": "Check integration status, then analyze.",
+        "answer": "The Machines Output Dashboard provides three main views for displaying machine outputs: Daily Output, Weekly Output, and Monthly Output. The filter set before opening the page will affect all three views."
+      },
+      {
+        "question": "Answer using only the provided snippet:\n\n---\nSnippet: \"Import MTS orders via Excel into the Pulse Digital system for further planning. Annual Quotas actualization process: Agree on Sales Channel-wise budget. Import via Excel file into Pulse Digital.\"\n---\n\nHow are MTS orders and sales budgets imported into the planning system?",
+        "context": "You are a Business Process Expert specializing in manufacturing planning systems. You answer questions using your knowledge of User Manuals and Business Blueprints, with the Blueprint taking precedence when conflicts arise.",
+        "reasoning": "Check integration status, then analyze.",
+        "answer": "Based on the provided snippet, both MTS orders and Sales Channel-wise budgets are imported into the Pulse Digital system via Excel files. MTS orders are calculated in Excel and then imported into Pulse Digital for further planning. Similarly, once the Sales Channel-wise budget is agreed upon, it is also imported via an Excel file into Pulse Digital."
+      }
+    ],
+    "signature": {
+      "instructions": "You are a Senior Pulse ERP Support Consultant.\n\nPRIORITY RULES (follow in strict order):\n\nRULE 1 - INTEGRATION CHECK (MANDATORY FIRST STEP):\n  Scan the context for: \"Integrated\", \"SAP Source\", \"Read-Only\", \"Auto-Generated\", \"Imported from SAP\". If ANY of these appear for the entity in question, the entity CANNOT be manually created, edited, or deleted. State this clearly and do NOT provide creation/edit steps.\n\nRULE 2 - BLUEPRINT OVERRIDES MANUAL:\n  Context tagged [BLUEPRINT] is authoritative. Context tagged [MANUAL] is supplementary. If they conflict, BLUEPRINT wins.\n\nRULE 3 - ROLE EXTRACTION:\n  Identify who performs each action.\n\nRULE 4 - NAVIGATION PATHS:\n  Bold every system navigation path.\n\nRULE 5 - WORKFLOW STEPS:\n  Use numbered steps for multi-stage processes. Mention specific buttons and confirmation prompts.",
+      "fields": [
+        {
+          "prefix": "Context:",
+          "description": "Tagged snippets: [BLUEPRINT] for integration rules, [MANUAL] for UI procedures."
+        },
+        {
+          "prefix": "History Summary:",
+          "description": "Brief summary of recent conversation context (if available). Use it to resolve references like 'that' or 'what about sales orders'."
+        },
+        {
+          "prefix": "Question:",
+          "description": "${question}"
+        },
+        {
+          "prefix": "Reasoning:",
+          "description": "FIRST state integration status (Integrated or Manual). THEN explain your logic. If Integrated, explain WHY no steps are possible."
+        },
+        {
+          "prefix": "Answer:",
+          "description": "If entity is Integrated/Read-Only: state it cannot be manually created and explain the SAP sync process. If Manual: provide step-by-step guide with roles and navigation paths."
+        }
+      ]
+    },
+    "lm": null
+  },
+  "metadata": {
+    "dependency_versions": {
+      "python": "3.13",
+      "dspy": "3.1.3",
+      "cloudpickle": "3.1"
+    }
+  }
+}
