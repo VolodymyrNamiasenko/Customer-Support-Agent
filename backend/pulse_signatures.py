@@ -1,5 +1,5 @@
 import dspy
-from rules_config import build_rules_text, load_rules_config
+from backend.rules_config import build_rules_text, load_rules_config
 
 
 class PulseSupportSignature(dspy.Signature):

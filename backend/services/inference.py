@@ -15,7 +15,7 @@ class PulseAssistant(dspy.Module):
         self.generate_answer = dspy.ChainOfThought(PulseSupportSignature)
 
     def forward(self, context, question):
-        return self.generate_answer(context=context, question=question)
+        return self.generate_answer(context=context, question=question, history_summary="")
 
 
 _predictor = None

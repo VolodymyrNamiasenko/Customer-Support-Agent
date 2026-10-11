@@ -3,8 +3,6 @@ import os
 from datetime import datetime, timezone
 from typing import List, Tuple
 
-import docx2txt
-import pdfplumber
 from langchain_core.documents import Document
 from langchain_text_splitters import MarkdownHeaderTextSplitter, RecursiveCharacterTextSplitter
 
@@ -17,10 +15,12 @@ from backend.config import (
 
 
 def _read_docx(path: str) -> str:
+    import docx2txt
     return docx2txt.process(path) or ""
 
 
 def _read_pdf(path: str) -> str:
+    import pdfplumber
     text_parts = []
     with pdfplumber.open(path) as pdf:
         for page in pdf.pages:

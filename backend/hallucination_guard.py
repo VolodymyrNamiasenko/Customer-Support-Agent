@@ -1,7 +1,7 @@
 import re
 from dataclasses import dataclass, field
 from typing import List
-from rules_config import get_signal_list, load_rules_config
+from backend.rules_config import get_signal_list, load_rules_config
 
 _rules_config = load_rules_config()
 INTEGRATION_SIGNALS = get_signal_list(_rules_config, "integration_signals")

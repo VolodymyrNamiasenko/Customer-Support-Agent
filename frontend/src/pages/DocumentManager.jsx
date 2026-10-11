@@ -16,7 +16,7 @@ export default function DocumentManager() {
   };
 
   useEffect(() => {
-    refresh();
+    refresh().catch((e) => setNotice({ type: "warning", message: e.message }));
   }, []);
 
   const handleUpload = async (files) => {
@@ -33,8 +33,12 @@ export default function DocumentManager() {
 
   const handleDelete = async (filename) => {
     if (!confirm(`Delete ${filename}?`)) return;
-    await deleteDocument(filename);
-    await refresh();
+    try {
+      await deleteDocument(filename);
+      await refresh();
+    } catch (e) {
+      setNotice({ type: "warning", message: e.message });
+    }
   };
 
   return (

@@ -22,6 +22,12 @@ def _extract_sources(docs) -> List[str]:
 def chat(request: Request, payload: ChatRequest):
     vectorstore = request.app.state.vectorstore
     docs = vectorstore.similarity_search(payload.question, k=payload.k)
+    if not docs:
+        return {
+            "answer": "I could not find supporting documentation. Please upload a relevant source or clarify your question.",
+            "reasoning": "", "sources": [], "context_snippets": [],
+            "hallucination_guard": {"is_valid": False, "entity_is_integrated": False, "has_non_creation_signal": False, "warning": "insufficient_evidence"},
+        }
     docs = deduplicate_docs(docs)
     docs = tag_sources(docs)
     context_text = build_context(docs)
