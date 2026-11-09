@@ -13,6 +13,7 @@ from backend.services import document_store
 from backend.services.file_safety import upload_path
 from backend.services.retrieval import deduplicate_docs, tag_sources
 from backend.routers import documents, rag, chat
+from backend.hallucination_guard import validate_response
 
 
 class RegressionTests(unittest.TestCase):
@@ -92,6 +93,28 @@ class RegressionTests(unittest.TestCase):
         self.assertEqual(result.status_code, 200)
         self.assertEqual(result.json()["sources"], [])
         infer.assert_not_called()
+
+    def test_answer_exposes_retrieved_sources_and_guard(self):
+        guide = Path(__file__).resolve().parents[1] / "examples/synthetic_support_guide.md"
+        self.vector.similarity_search.return_value = [
+            Document(page_content=guide.read_text(), metadata={"source": str(guide)})
+        ]
+        answer = "Demo Orders cannot be manually created; review the source system."
+        check = validate_response(guide.read_text(), answer)
+        with patch.object(chat, "run_inference", return_value=(SimpleNamespace(reasoning=""), answer, check)) as infer:
+            response = self.client.post("/api/chat", json={"question": "Which system owns Demo Orders?"})
+        self.assertEqual(response.status_code, 200, response.text)
+        body = response.json()
+        self.assertEqual(body["sources"], [guide.name])
+        self.assertEqual(body["context_snippets"][0]["source"], str(guide))
+        self.assertEqual(body["answer"], answer)
+        self.assertTrue(body["hallucination_guard"]["entity_is_integrated"])
+        self.assertIn("untrusted document text", infer.call_args.kwargs["context_text"])
+
+    def test_synthetic_integration_rule_blocks_unqualified_creation_advice(self):
+        context = "Demo Orders are imported from SAP and are read-only."
+        self.assertFalse(validate_response(context, "Click New to create an order.").is_valid)
+        self.assertTrue(validate_response(context, "Orders cannot be manually created.").is_valid)
 
     def test_full_content_dedup_and_no_mutation(self):
         a = Document(page_content="x" * 200 + "first", metadata={"source": "manual.md"})
