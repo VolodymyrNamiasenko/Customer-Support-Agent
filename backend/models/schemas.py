@@ -51,6 +51,8 @@ class GuardResult(BaseModel):
 
 
 class ChatResponse(BaseModel):
+    review_id: str
+    review_status: str
     answer: str
     reasoning: str
     sources: List[str]

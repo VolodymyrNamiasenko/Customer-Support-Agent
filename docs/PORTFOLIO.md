@@ -7,7 +7,7 @@ This repository demonstrates a document-grounded ERP/MES support prototype. It d
 | Document-grounded answers | `backend/services/ingestion.py`, `retrieval.py`, `inference.py` | Retrieval does not establish factual correctness |
 | Source references | `backend/routers/chat.py` and frontend `ChatMessage.jsx` | Lists retrieved documents, not verified claim-level citations |
 | Response checks and business restrictions | `backend/hallucination_guard.py`, `rules_config.py` | Regex/keyword heuristics can overblock or miss unsafe advice |
-| Human review | Source and guard information shown in the interface | User-led review, not an enforced approval queue |
+| Human review and feedback | `backend/services/reviews.py`, review routes and Reviews page | Persistent pending/approved/rejected states, 1–5 ratings and event history; release requires approval. Single-user reviewer names are self-reported |
 | Model stack | FastAPI, DSPy, Ollama, Chroma, sentence embeddings, React | No live ERP/MES transactions or autonomous system writes |
 
 The professional pilot and any user-rated questions described in the author's experience are separate from repository verification. No private feedback is published here and no benchmark is inferred from those statements.

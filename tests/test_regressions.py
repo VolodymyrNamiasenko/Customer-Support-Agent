@@ -14,6 +14,7 @@ from backend.services.file_safety import upload_path
 from backend.services.retrieval import deduplicate_docs, tag_sources
 from backend.routers import documents, rag, chat
 from backend.hallucination_guard import validate_response
+from backend.services.reviews import ReviewStore
 
 
 class RegressionTests(unittest.TestCase):
@@ -31,6 +32,7 @@ class RegressionTests(unittest.TestCase):
         self.vector._collection.count.return_value = 1
         app = FastAPI()
         app.state.vectorstore = self.vector
+        app.state.review_store = ReviewStore(self.root / 'reviews.sqlite3')
         app.state.write_lock = Lock()
         app.include_router(documents.router, prefix="/api/documents")
         app.include_router(rag.router, prefix="/api/rag")

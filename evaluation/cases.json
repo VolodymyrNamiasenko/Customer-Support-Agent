@@ -1,0 +1,8 @@
+[
+  {"name":"read-only entity blocked", "context":"Demo Orders are imported from SAP and are read-only.", "answer":"Click New to create an order.", "expected_allowed":false},
+  {"name":"read-only restriction explained", "context":"Demo Orders are imported from SAP and are read-only.", "answer":"Demo Orders cannot be manually created.", "expected_allowed":true},
+  {"name":"indirect ownership restriction", "context":"The entity is maintained in SAP; MES receives it through integration.", "answer":"Create this entity directly in MES.", "expected_allowed":false},
+  {"name":"manual operation in unrelated context", "context":"The demo guide explains how to open the Help page.", "answer":"Open the Help page to read the guide.", "expected_allowed":true},
+  {"name":"contradictory instructions rejected", "context":"Demo Orders are imported from SAP and read-only.", "answer":"Orders cannot be manually created. Click New to create an order.", "expected_allowed":false},
+  {"name":"negative instructions are not positive actions", "context":"Demo Orders are imported from SAP and read-only.", "answer":"Orders cannot be manually created. Do not click New to create an order.", "expected_allowed":true}
+]

@@ -10,9 +10,18 @@ Upload manuals and integration blueprints, inspect indexed chunks, and ask quest
 2. The backend chunks text, embeds it and stores it in a local Chroma index.
 3. A question retrieves snippets; DSPy passes tagged evidence to Ollama.
 4. A heuristic response check looks for integration/read-only signals and may replace an unsafe answer with a restriction notice.
-5. The interface shows the answer, retrieved source names and guard status. A person checks the supporting material before applying advice.
+5. The interface shows a draft answer, retrieved source names and rule-check status. Every answer is saved in the Reviews queue.
+6. A reviewer checks the supporting material, records an approval or rejection and can add a 1–5 rating. The release endpoint and Copy approved answer action require approval. Missing evidence or failed checks prevent approval.
 
-Source names identify **retrieved documents**, not proof that every answer claim is supported. Human review is an operating practice, not a built-in approval workflow. A passing guard is not a factual-accuracy score. Empty retrieval abstains; weak or irrelevant nonempty retrieval can still produce a bad answer.
+Source names identify **retrieved documents**, not proof that every answer claim is supported. The review workflow records versioned decisions and history in a local SQLite database; reviewer names are self-reported in this single-user application, not authenticated identities. A passing rule check is not a factual-accuracy score. Draft answers remain visible for review. Empty retrieval abstains; weak or irrelevant nonempty retrieval can still produce a bad answer.
+
+## Review and feedback
+
+Open **Reviews** after asking a question. Filter pending/approved/rejected answers, inspect sources, enter your reviewer name and notes, and approve or reject. Ratings are saved explicitly; the summary counts actual records, not sample or invented pilot ratings. Concurrent/stale changes return a conflict so a newer decision is not silently overwritten.
+
+`REVIEW_DB_PATH` optionally selects a private local SQLite file; default: `data/reviews.sqlite3`. It stores questions, answers, decisions, feedback and event history. Keep this directory private and out of Git. The app does not automatically send an approved answer to ERP/MES or enforce review outside its release endpoint.
+
+API: `GET /api/reviews`, `GET /api/reviews/metrics`, `GET /api/reviews/{id}`, `POST /api/reviews/{id}/decision`, `POST /api/reviews/{id}/rating`, `GET /api/reviews/{id}/release`. Decision/rating requests require the current `version`, `actor` and decision/rating. See [workflow checks](docs/ADVANCED_WORKFLOWS.md).
 
 ## What is implemented
 

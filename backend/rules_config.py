@@ -71,6 +71,7 @@ DEFAULT_SIGNALS = {
         r"pushed?\s+from\s+sap",
         r"replicated\s+from\s+sap",
         r"create\s+.*?\s+in\s+sap",
+        r"(?<!not )\b(?:maintained|managed|owned)\s+(?:in|by)\s+sap\b",
     ],
     "hallucinated_actions": [
         r"click\s+(the\s+)?(on\s+)?(\"?\+\"?|new|add|create|insert)\s*(button|icon)?",

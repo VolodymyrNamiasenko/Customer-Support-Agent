@@ -4,6 +4,7 @@ __pycache__/
 .venv/
 venv/
 node_modules/
+frontend/node_modules
 dist/
 # runtime data
 uploads/
@@ -13,3 +14,6 @@ optimized_pulse_agent.json
 # local env
 .env
 .env.*
+data/
+*.sqlite3
+*.sqlite3-*

@@ -33,6 +33,18 @@ def _find_regex_matches(patterns: list, text: str) -> List[str]:
     return matched
 
 
+def _find_positive_actions(patterns, text):
+    matched = []
+    for pattern in patterns:
+        for match in re.finditer(pattern, text, re.IGNORECASE):
+            prefix = text[max(0, match.start() - 40):match.start()]
+            if re.search(r"(?:do\s+not|don't|never|cannot|must\s+not|should\s+not)\s+(?:manually\s+)?$", prefix):
+                continue
+            matched.append(pattern)
+            break
+    return matched
+
+
 def validate_response(
     context: str, answer: str, reasoning: str = ""
 ) -> ValidationResult:
@@ -77,11 +89,11 @@ def validate_response(
     answer_is_safe = bool(matched_safe_signals)
 
     # ── Check output for hallucinated creation actions (for diagnostics) ──
-    matched_patterns = _find_regex_matches(HALLUCINATED_ACTIONS, full_output)
+    matched_patterns = _find_positive_actions(HALLUCINATED_ACTIONS, full_output)
     matched_entity_creation = _find_regex_matches(ENTITY_CREATION_LANGUAGE, full_output)
 
     # New logic: If entity is blocked and answer does NOT explicitly say creation is not possible, block it.
-    if entity_blocked and not answer_is_safe:
+    if entity_blocked and (not answer_is_safe or matched_patterns):
         trigger_source = []
         if is_integrated:
             trigger_source.append(
@@ -93,7 +105,7 @@ def validate_response(
             )
         warning = (
             f"BLOCKED: Context contains {' and '.join(trigger_source)}, "
-            "but the response does not explicitly state that creation is not possible. "
+            "but the response lacks a safe restriction or contains conflicting creation instructions. "
             "This is treated as a hallucination risk."
         )
         return ValidationResult(

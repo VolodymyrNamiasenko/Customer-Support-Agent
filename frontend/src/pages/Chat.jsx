@@ -26,7 +26,8 @@ export default function Chat() {
         role: "assistant",
         content: res.answer,
         sources: res.sources,
-        guard: res.hallucination_guard
+        guard: res.hallucination_guard,
+        reviewId: res.review_id
       };
       setMessages((m) => [...m, assistantMsg]);
     } catch (err) {
@@ -48,6 +49,7 @@ export default function Chat() {
               content={msg.content}
               sources={msg.sources}
               guard={msg.guard}
+              reviewId={msg.reviewId}
             />
           ))}
         </div>
@@ -69,7 +71,7 @@ export default function Chat() {
           </button>
         </div>
         {error && <p role="alert" className="text-red-400">{error}</p>}
-        <p className="text-sm text-slate-400">Check retrieved sources and business restrictions before applying advice. The response check does not guarantee correctness.</p>
+        <p className="text-sm text-slate-400">Answers are saved as drafts. Review the sources and approve or reject each answer in the Reviews tab before using it.</p>
       </div>
 
       <div className="bg-slate-900/70 border border-slate-800 rounded-xl p-5 space-y-4">

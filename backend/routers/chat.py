@@ -5,8 +5,14 @@ import os
 from backend.models.schemas import ChatRequest, ChatResponse
 from backend.services.retrieval import deduplicate_docs, tag_sources, build_context
 from backend.services.inference import run_inference
+from backend.routers.reviews import store
 
 router = APIRouter()
+
+
+def reviewed_draft(request, question, response):
+    record = store(request).create(question, response)
+    return {**response, 'review_id': record['id'], 'review_status': record['status']}
 
 
 def _extract_sources(docs) -> List[str]:
@@ -23,11 +29,11 @@ def chat(request: Request, payload: ChatRequest):
     vectorstore = request.app.state.vectorstore
     docs = vectorstore.similarity_search(payload.question, k=payload.k)
     if not docs:
-        return {
+        return reviewed_draft(request, payload.question, {
             "answer": "I could not find supporting documentation. Please upload a relevant source or clarify your question.",
             "reasoning": "", "sources": [], "context_snippets": [],
             "hallucination_guard": {"is_valid": False, "entity_is_integrated": False, "has_non_creation_signal": False, "warning": "insufficient_evidence"},
-        }
+        })
     docs = deduplicate_docs(docs)
     docs = tag_sources(docs)
     context_text = build_context(docs)
@@ -50,7 +56,7 @@ def chat(request: Request, payload: ChatRequest):
             }
         )
 
-    return {
+    return reviewed_draft(request, payload.question, {
         "answer": answer,
         "reasoning": getattr(result, "reasoning", ""),
         "sources": sources,
@@ -62,7 +68,7 @@ def chat(request: Request, payload: ChatRequest):
             "warning": check.warning or None,
         },
         "context_snippets": context_snippets,
-    }
+    })
 
 
 @router.post("/v1/query", response_model=ChatResponse)
