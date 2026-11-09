@@ -7,21 +7,32 @@ export default function RAGExplorer() {
   const [filename, setFilename] = useState("");
   const [search, setSearch] = useState("");
   const [chunks, setChunks] = useState([]);
+  const [error, setError] = useState("");
 
   useEffect(() => {
-    listDocuments().then((data) => setDocs(data.documents));
+    let active = true;
+    listDocuments().then((data) => { if (active) setDocs(data.documents); })
+      .catch((err) => { if (active) setError(err.message); });
+    return () => { active = false; };
   }, []);
 
   useEffect(() => {
+    let active = true;
     const load = async () => {
-      const data = await fetchChunks({ filename, search, limit: 50, offset: 0 });
-      setChunks(data.chunks);
+      try {
+        const data = await fetchChunks({ filename, search, limit: 50, offset: 0 });
+        if (active) { setChunks(data.chunks); setError(""); }
+      } catch (err) {
+        if (active) { setError(err.message); setChunks([]); }
+      }
     };
-    load();
+    const timer = setTimeout(load, 300);
+    return () => { active = false; clearTimeout(timer); };
   }, [filename, search]);
 
   return (
     <div className="space-y-6">
+      {error && <p role="alert" className="text-red-400">{error}</p>}
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <input
           className="w-full md:w-2/3 px-4 py-2 rounded-lg bg-slate-900 border border-slate-700"

@@ -1,6 +1,7 @@
 import React from "react";
+import { Link } from 'react-router-dom';
 
-export default function ChatMessage({ role, content, sources, guard }) {
+export default function ChatMessage({ role, content, sources, guard, reviewId }) {
   const isUser = role === "user";
   return (
     <div className={`flex ${isUser ? "justify-end" : "justify-start"}`}>
@@ -18,12 +19,13 @@ export default function ChatMessage({ role, content, sources, guard }) {
                   guard.is_valid ? "bg-emerald-500/30" : "bg-rose-500/30"
                 }`}
               >
-                {guard.is_valid ? "✓ Verified" : "⚠ Blocked"}
+                {guard.is_valid ? "Rule checks passed" : "Rule check failed"}
               </span>
             )}
             {sources?.length > 0 && (
               <span>Sources: {sources.join(", ")}</span>
             )}
+            {reviewId && <div className="mt-2"><Link className="underline text-cyan-300" to={`/reviews#${reviewId}`}>Open review queue</Link></div>}
           </div>
         )}
       </div>

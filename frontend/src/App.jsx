@@ -3,6 +3,7 @@ import { NavLink, Routes, Route, Navigate } from "react-router-dom";
 import DocumentManager from "./pages/DocumentManager.jsx";
 import RAGExplorer from "./pages/RAGExplorer.jsx";
 import Chat from "./pages/Chat.jsx";
+import Reviews from './pages/Reviews.jsx';
 
 const NavTab = ({ to, label }) => (
   <NavLink
@@ -31,6 +32,7 @@ export default function App() {
           <NavTab to="/documents" label="Documents" />
           <NavTab to="/explorer" label="Explorer" />
           <NavTab to="/chat" label="Chat" />
+          <NavTab to="/reviews" label="Reviews" />
         </nav>
       </header>
 
@@ -40,6 +42,7 @@ export default function App() {
           <Route path="/documents" element={<DocumentManager />} />
           <Route path="/explorer" element={<RAGExplorer />} />
           <Route path="/chat" element={<Chat />} />
+          <Route path="/reviews" element={<Reviews />} />
         </Routes>
       </main>
     </div>

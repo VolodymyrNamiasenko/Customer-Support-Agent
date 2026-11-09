@@ -5,6 +5,8 @@ import { chatQuery } from "../api/client.js";
 export default function Chat() {
   const [messages, setMessages] = useState([]);
   const [question, setQuestion] = useState("");
+  const [sending, setSending] = useState(false);
+  const [error, setError] = useState("");
   const [settings, setSettings] = useState({
     k: 5,
     temperature: 0.1,
@@ -12,18 +14,28 @@ export default function Chat() {
   });
 
   const send = async () => {
-    if (!question.trim()) return;
+    if (!question.trim() || sending) return;
+    setSending(true);
+    setError("");
     const userMsg = { role: "user", content: question };
     setMessages((m) => [...m, userMsg]);
     setQuestion("");
-    const res = await chatQuery({ question, ...settings });
-    const assistantMsg = {
-      role: "assistant",
-      content: res.answer,
-      sources: res.sources,
-      guard: res.hallucination_guard
-    };
-    setMessages((m) => [...m, assistantMsg]);
+    try {
+      const res = await chatQuery({ question, ...settings });
+      const assistantMsg = {
+        role: "assistant",
+        content: res.answer,
+        sources: res.sources,
+        guard: res.hallucination_guard,
+        reviewId: res.review_id
+      };
+      setMessages((m) => [...m, assistantMsg]);
+    } catch (err) {
+      setError(`Could not get an answer: ${err.message}. Check the backend and Ollama, then retry your question.`);
+      setQuestion(question);
+    } finally {
+      setSending(false);
+    }
   };
 
   return (
@@ -37,6 +49,7 @@ export default function Chat() {
               content={msg.content}
               sources={msg.sources}
               guard={msg.guard}
+              reviewId={msg.reviewId}
             />
           ))}
         </div>
@@ -46,14 +59,19 @@ export default function Chat() {
             placeholder="Ask a question..."
             value={question}
             onChange={(e) => setQuestion(e.target.value)}
+            disabled={sending}
+            maxLength={16000}
           />
           <button
             className="px-5 py-3 rounded-lg bg-cyan-500 text-slate-950 font-semibold"
             onClick={send}
+            disabled={sending || !question.trim()}
           >
-            Send
+            {sending ? "Answering..." : "Send"}
           </button>
         </div>
+        {error && <p role="alert" className="text-red-400">{error}</p>}
+        <p className="text-sm text-slate-400">Answers are saved as drafts. Review the sources and approve or reject each answer in the Reviews tab before using it.</p>
       </div>
 
       <div className="bg-slate-900/70 border border-slate-800 rounded-xl p-5 space-y-4">

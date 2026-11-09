@@ -22,9 +22,9 @@ def list_chunks(
         kwargs = {}
         if filename:
             kwargs["filter"] = {"manual_name": filename}
-        results = vectorstore.similarity_search_with_relevance_scores(search, k=limit, **kwargs)
+        results = vectorstore.similarity_search_with_relevance_scores(search, k=limit + offset, **kwargs)
         total = len(results)
-        for doc, score in results:
+        for doc, score in results[offset:offset + limit]:
             chunks.append(
                 {
                     "id": doc.metadata.get("id", ""),
@@ -38,14 +38,14 @@ def list_chunks(
         where = {"manual_name": filename} if filename else None
         data = vectorstore._collection.get(
             where=where,
-            include=["documents", "metadatas", "ids"],
+            include=["documents", "metadatas"],
             limit=limit,
             offset=offset,
         )
         docs = data.get("documents", [])
         metas = data.get("metadatas", [])
         ids = data.get("ids", [])
-        total = len(docs)
+        total = len(vectorstore._collection.get(where=where, include=[]).get("ids", []))
         for doc, meta, doc_id in zip(docs, metas, ids):
             chunks.append(
                 {

@@ -1,4 +1,4 @@
-const API_BASE = "http://localhost:8000";
+const API_BASE = (import.meta.env.VITE_API_BASE_URL || "http://localhost:8000").replace(/\/$/, "");
 
 async function request(path, options = {}) {
   const res = await fetch(`${API_BASE}${path}`, options);
@@ -41,3 +41,11 @@ export async function chatQuery(payload) {
     body: JSON.stringify(payload)
   });
 }
+
+export const listReviews = (status, offset = 0) => request(`/api/reviews?${new URLSearchParams({ ...(status ? { status } : {}), offset, limit: 25 })}`);
+export const reviewMetrics = () => request('/api/reviews/metrics');
+export const reviewDetail = (id) => request(`/api/reviews/${encodeURIComponent(id)}`);
+export const releasedAnswer = (id) => request(`/api/reviews/${encodeURIComponent(id)}/release`);
+export const submitReview = (id, action, payload) => request(`/api/reviews/${encodeURIComponent(id)}/${action}`, {
+  method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
+});

@@ -7,12 +7,14 @@ from langchain_community.vectorstores import Chroma
 from langchain_huggingface import HuggingFaceEmbeddings
 
 from backend.config import CHROMA_PERSIST_DIR, EMBEDDING_MODEL, UPLOAD_DIR
-from backend.routers import documents, rag, chat
+from backend.routers import documents, rag, chat, reviews
+from backend.services.reviews import ReviewStore
 from backend.services.document_store import load_registry
 
 
 def create_app() -> FastAPI:
     app = FastAPI(title="Pulse RAG Manager", version="1.0")
+    app.state.review_store = ReviewStore(os.getenv('REVIEW_DB_PATH', os.path.join(os.path.dirname(UPLOAD_DIR), 'data', 'reviews.sqlite3')))
 
     app.add_middleware(
         CORSMiddleware,
@@ -43,6 +45,7 @@ def create_app() -> FastAPI:
     app.include_router(documents.router, prefix="/api/documents", tags=["documents"])
     app.include_router(rag.router, prefix="/api/rag", tags=["rag"])
     app.include_router(chat.router, prefix="/api", tags=["chat"])
+    app.include_router(reviews.router, prefix="/api/reviews", tags=["reviews"])
     return app
 
 

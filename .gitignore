@@ -4,9 +4,16 @@ __pycache__/
 .venv/
 venv/
 node_modules/
+frontend/node_modules
+dist/
 # runtime data
 uploads/
 rag_dbs/
+document_registry.json
+optimized_pulse_agent.json
 # local env
 .env
 .env.*
+data/
+*.sqlite3
+*.sqlite3-*

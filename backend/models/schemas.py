@@ -30,10 +30,10 @@ class ErrorResponse(BaseModel):
 
 
 class ChatRequest(BaseModel):
-    question: str
+    question: str = Field(min_length=1, max_length=16000, pattern=r"\S")
     k: int = Field(default=5, ge=1, le=15)
     temperature: float = Field(default=0.1, ge=0.0, le=1.0)
-    max_tokens: int = Field(default=512, ge=1)
+    max_tokens: int = Field(default=512, ge=1, le=4096)
 
 
 class ContextSnippet(BaseModel):
@@ -51,6 +51,8 @@ class GuardResult(BaseModel):
 
 
 class ChatResponse(BaseModel):
+    review_id: str
+    review_status: str
     answer: str
     reasoning: str
     sources: List[str]
