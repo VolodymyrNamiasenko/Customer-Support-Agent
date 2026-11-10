@@ -1,0 +1,9 @@
+[
+  {"id":"holdout-calibration", "text":"Invented procedure: the calibration certificate for a fictional torque wrench is kept in the blue calibration cabinet. This is synthetic data.", "metadata":{"source":"synthetic-calibration.md","manual_name":"synthetic-calibration.md"}},
+  {"id":"holdout-furnace", "text":"Invented furnace procedure: a Manufacturing Engineer reviews every temperature exception and authorizes restart. This is synthetic data, not a real safety procedure.", "metadata":{"source":"synthetic-furnace.md","manual_name":"synthetic-furnace.md"}},
+  {"id":"holdout-traveler", "text":"Invented batch release requires two records. The first record is the completed batch traveler. The second is the certificate of analysis. Synthetic demonstration only.", "metadata":{"source":"synthetic-traveler.md","manual_name":"synthetic-traveler.md"}},
+  {"id":"holdout-analysis", "text":"Invented batch release requires a certificate of analysis accompanying the completed batch traveler. These two records are fictional demonstration requirements.", "metadata":{"source":"synthetic-analysis.md","manual_name":"synthetic-analysis.md"}},
+  {"id":"holdout-gauge", "text":"The fictional G7 gauge has a daily inspection before the first shift. G7 is invented; this is not operational guidance.", "metadata":{"source":"synthetic-gauge.md","manual_name":"synthetic-gauge.md"}},
+  {"id":"holdout-distractor-label", "text":"Invented carton labels are orange. The label color is not a batch release record. Synthetic demonstration only.", "metadata":{"source":"synthetic-label.md","manual_name":"synthetic-label.md"}},
+  {"id":"holdout-distractor-parking", "text":"The imaginary visitor parking gate opens at noon. This is unrelated synthetic distractor content.", "metadata":{"source":"synthetic-parking.md","manual_name":"synthetic-parking.md"}}
+]

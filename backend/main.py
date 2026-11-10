@@ -14,6 +14,7 @@ from backend.services.document_store import load_registry
 
 def create_app() -> FastAPI:
     app = FastAPI(title="Pulse RAG Manager", version="1.0")
+    app.state.pilot_mode = True
     app.state.review_store = ReviewStore(os.getenv('REVIEW_DB_PATH', os.path.join(os.path.dirname(UPLOAD_DIR), 'data', 'reviews.sqlite3')))
 
     app.add_middleware(

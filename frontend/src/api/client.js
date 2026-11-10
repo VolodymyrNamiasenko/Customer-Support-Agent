@@ -15,14 +15,14 @@ export async function listDocuments() {
   return request("/api/documents");
 }
 
-export async function uploadDocument(file) {
+export async function uploadDocument(file, changeId = '') {
   const form = new FormData();
   form.append("file", file);
-  return request("/api/documents/upload", { method: "POST", body: form });
+  return request(`/api/documents/upload${changeId ? `?change_id=${encodeURIComponent(changeId)}` : ''}`, { method: "POST", body: form });
 }
 
-export async function deleteDocument(filename) {
-  return request(`/api/documents/${encodeURIComponent(filename)}`, { method: "DELETE" });
+export async function deleteDocument(filename, changeId = '') {
+  return request(`/api/documents/${encodeURIComponent(filename)}${changeId ? `?change_id=${encodeURIComponent(changeId)}` : ''}`, { method: "DELETE" });
 }
 
 export async function fetchChunks({ filename, search, limit = 50, offset = 0 }) {
@@ -40,6 +40,14 @@ export async function chatQuery(payload) {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload)
   });
+}
+
+export async function expertQueue(offset = 0) {
+  return request(`/api/reviews/expert-queue?offset=${offset}`);
+}
+
+export async function expertPolicy() {
+  return request('/api/reviews/expert-policy');
 }
 
 export const listReviews = (status, offset = 0) => request(`/api/reviews?${new URLSearchParams({ ...(status ? { status } : {}), offset, limit: 25 })}`);

@@ -15,6 +15,7 @@ from backend.services.retrieval import deduplicate_docs, tag_sources
 from backend.routers import documents, rag, chat
 from backend.hallucination_guard import validate_response
 from backend.services.reviews import ReviewStore
+from pilot_fakes import configure_vector, PROVENANCE
 
 
 class RegressionTests(unittest.TestCase):
@@ -29,8 +30,10 @@ class RegressionTests(unittest.TestCase):
         self.uploads.start()
         self.addCleanup(self.uploads.stop)
         self.vector = Mock()
+        configure_vector(self.vector)
         self.vector._collection.count.return_value = 1
         app = FastAPI()
+        app.state.pilot_provenance = PROVENANCE
         app.state.vectorstore = self.vector
         app.state.review_store = ReviewStore(self.root / 'reviews.sqlite3')
         app.state.write_lock = Lock()

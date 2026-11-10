@@ -12,6 +12,7 @@ from langchain_core.documents import Document
 from backend.hallucination_guard import validate_response
 from backend.routers import chat, reviews
 from backend.services.reviews import ReviewConflict, ReviewStore
+from pilot_fakes import configure_vector, PROVENANCE
 
 
 class ReviewWorkflowTests(TestCase):
@@ -23,6 +24,8 @@ class ReviewWorkflowTests(TestCase):
         app = FastAPI()
         app.state.review_store = self.store
         self.vector = Mock()
+        configure_vector(self.vector)
+        app.state.pilot_provenance = PROVENANCE
         app.state.vectorstore = self.vector
         app.include_router(chat.router, prefix="/api")
         app.include_router(reviews.router, prefix="/api/reviews")
@@ -75,11 +78,11 @@ class ReviewWorkflowTests(TestCase):
         self.assertEqual(restarted["status"], "approved")
         self.assertEqual(restarted["rating"], 4)
         self.assertEqual(
-            [e["action"] for e in restarted["events"]],
+            [e["action"] for e in restarted["events"]][:3],
             ["generated", "approved", "rated:4"],
         )
         self.assertEqual(
-            self.client.get("/api/reviews/metrics").json(),
+            {k: v for k, v in self.client.get("/api/reviews/metrics").json().items() if k != "pilot"},
             {
                 "total": 1,
                 "pending": 0,

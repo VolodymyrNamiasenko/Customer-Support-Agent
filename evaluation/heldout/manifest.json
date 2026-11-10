@@ -1,0 +1,8 @@
+{
+  "version":"synthetic-retrieval-heldout-v1",
+  "sha256": {
+    "retrieval_v1.json":"19eb8957969b78a602bc1687dc74f60ce47a3826b689cc1d42c2568518c70819",
+    "corpus_v1.json":"e180a8cbafc0ac127ae9c5e22c467ffd5c181c3ccc884a2c46b114496194a36b"
+  },
+  "separation":"New invented calibration, furnace, batch-release and gauge scenarios; not the six dev guard cases. Do not tune on these questions. Changes require a new reviewed benchmark version."
+}
