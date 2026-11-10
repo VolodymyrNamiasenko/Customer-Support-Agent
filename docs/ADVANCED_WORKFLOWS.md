@@ -7,10 +7,12 @@ Start the backend and frontend as in the README. Upload only the invented guide 
 1. A chat response creates a persisted **pending** record with its question, answer, sources and rule-check result.
 2. Open **Reviews**. Inspect the source, enter a reviewer name and record an approval/rejection. Missing sources or a failed rule check prevent approval.
 3. The API release endpoint and **Copy approved answer** action work only for approved records. A later rejection revokes release. Raw draft text remains visible for human inspection.
-4. Save a rating explicitly. Metrics count unique rated responses using each response's latest rating; history retains prior changes. No historical workplace feedback is preloaded.
+4. Save customer satisfaction explicitly and anonymously. It is not correctness. Manufacturing Engineer correctness requires a separate verdict and supporting evidence. Metrics count the latest rating/verdict per response with separate denominators. No historical workplace feedback is preloaded.
 5. Refresh after a version conflict. Decisions and ratings use SQLite transactions and expected versions to prevent stale updates overwriting newer reviews.
 
 Reviewer identity is self-reported. This is a local single-user workflow, not enterprise authentication, separation of duties or a guarantee that advice is correct. Questions, answers and comments are private local data; do not commit the database.
+
+The pilot extension adds score-aware Chroma traces, expert selection, frozen retrieval checks and versioned private export without replacing ReviewStore or its append-only events. Corpus changes now require an evaluated expert-linked plan. See [PILOT.md](PILOT.md) before using the older walkthrough's upload step; do not bypass the change gate by editing the live index.
 
 ## Reproducible checks
 

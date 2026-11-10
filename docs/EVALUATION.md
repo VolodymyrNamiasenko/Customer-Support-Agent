@@ -21,6 +21,14 @@ Accuracy alone is misleading for skewed classes. Report denominators and error c
 
 ## Turn failures into targeted work
 
+### Pilot taxonomy v1 and independent measures
+
+The customer 1–5 rating measures satisfaction, never correctness. Report its mean and N separately from the Manufacturing Engineer's `correct` / `partially_correct` / `incorrect` counts and N_reviewed. The selected expert sample oversamples risks and is not an unbiased whole-pilot accuracy estimate.
+
+Machine error buckets are `bad_label`, `missing_source`, `wrong_retrieval`, `source_conflict`, `unsupported_claim`, `unsupported_action`, `hallucinated_step`, `malformed_input`, `timeout`, `duplicate_import`, `subgroup_mismatch`. `unsupported_claim` and `hallucinated_step` explicitly refine the original unsupported-action taxonomy. Use one primary bucket for a non-correct verdict; correct has a null bucket. Narrative rationale/evidence can describe additional issues.
+
+Frozen synthetic retrieval questions and corpus are separate from the six development guard cases; see `evaluation/heldout/manifest.json`. Measure recall@3 before DSPy, and do not use held-out results for tuning. The tiny synthetic set establishes a regression contract, not operational coverage. [Pilot workflow](PILOT.md) describes before/after evaluation, human action logging and privacy limits.
+
 Review incorrect examples and record error buckets: bad label, missing source, wrong retrieval, source conflict, unsupported action, malformed input, timeout, duplicate import, subgroup mismatch. Prioritize by frequency and business impact. Improve labels or targeted coverage before assuming a larger model or more agents is necessary.
 
 ## Safety, observability and deployment

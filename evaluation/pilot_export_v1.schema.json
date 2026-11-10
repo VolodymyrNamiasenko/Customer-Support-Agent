@@ -1,0 +1,711 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:pulse:pilot-export:1.0",
+  "title": "Private pilot export v1",
+  "type": "object",
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "exported_at": {
+      "type": "string"
+    },
+    "taxonomy_version": {
+      "const": "1"
+    },
+    "policy": {
+      "type": "object",
+      "properties": {
+        "version": {
+          "const": "pilot-v1"
+        },
+        "high_sample_probability": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "sme_role": {
+          "const": "Manufacturing Engineer"
+        },
+        "seed": {
+          "type": "string"
+        },
+        "identity_mapping": {
+          "const": false
+        }
+      },
+      "required": [
+        "version",
+        "high_sample_probability",
+        "sme_role",
+        "seed",
+        "identity_mapping"
+      ]
+    },
+    "records": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/record"
+      }
+    },
+    "review_events": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/event"
+      }
+    },
+    "retrieval_traces": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/trace"
+      }
+    },
+    "expert_verdicts": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/verdict"
+      }
+    },
+    "queue_selections": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/selection"
+      }
+    },
+    "evaluation_runs": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/evaluation"
+      }
+    },
+    "corpus_changes": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/change"
+      }
+    },
+    "corpus_change_events": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/change_event"
+      }
+    },
+    "metrics": {
+      "$ref": "#/$defs/metrics"
+    },
+    "privacy": {
+      "type": "object",
+      "properties": {
+        "rating_identity": {
+          "type": "string"
+        },
+        "free_text": {
+          "type": "string"
+        },
+        "legacy_database": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "rating_identity",
+        "free_text",
+        "legacy_database"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "required": [
+    "schema_version",
+    "exported_at",
+    "taxonomy_version",
+    "policy",
+    "records",
+    "review_events",
+    "retrieval_traces",
+    "expert_verdicts",
+    "queue_selections",
+    "evaluation_runs",
+    "corpus_changes",
+    "corpus_change_events",
+    "metrics",
+    "privacy"
+  ],
+  "additionalProperties": false,
+  "$defs": {
+    "record": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "question": {
+          "type": "string"
+        },
+        "response": {
+          "type": "object"
+        },
+        "status": {
+          "enum": [
+            "pending",
+            "approved",
+            "rejected"
+          ]
+        },
+        "version": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "rating": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 1,
+          "maximum": 5
+        },
+        "correctness": {
+          "enum": [
+            null,
+            "correct",
+            "partially_correct",
+            "incorrect"
+          ]
+        },
+        "cohort": {
+          "type": "string"
+        },
+        "generation_state": {
+          "enum": [
+            "legacy",
+            "retrieving",
+            "generating",
+            "completed",
+            "failed"
+          ]
+        }
+      },
+      "required": [
+        "id",
+        "question",
+        "response",
+        "status",
+        "version",
+        "rating",
+        "correctness",
+        "cohort",
+        "generation_state"
+      ]
+    },
+    "event": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "response_id": {
+          "type": "string"
+        },
+        "action": {
+          "type": "string"
+        },
+        "actor": {
+          "type": "string"
+        },
+        "note": {
+          "type": "string"
+        },
+        "version": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "created_at": {
+          "type": "string"
+        },
+        "data": {
+          "type": "object"
+        }
+      },
+      "required": [
+        "id",
+        "response_id",
+        "action",
+        "actor",
+        "note",
+        "version",
+        "created_at",
+        "data"
+      ],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "action": {
+                "pattern": "^rated:"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "actor": {
+                "const": "anonymous_customer"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "hit": {
+      "type": "object",
+      "properties": {
+        "chunk_id": {
+          "type": "string"
+        },
+        "rank": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "score": {
+          "type": "number"
+        },
+        "score_kind": {
+          "const": "distance"
+        },
+        "metric": {
+          "type": "string"
+        },
+        "content_hash": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "chunk_id",
+        "rank",
+        "score",
+        "score_kind",
+        "metric",
+        "content_hash"
+      ],
+      "additionalProperties": false
+    },
+    "trace": {
+      "type": "object",
+      "properties": {
+        "response_id": {
+          "type": "string"
+        },
+        "created_at": {
+          "type": "string"
+        },
+        "trace": {
+          "type": "object",
+          "properties": {
+            "schema_version": {
+              "const": "1.0"
+            },
+            "status": {
+              "enum": [
+                "completed",
+                "failed"
+              ]
+            },
+            "k": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "provenance": {
+              "type": "object",
+              "properties": {
+                "chat_model": {
+                  "type": "string"
+                },
+                "embedding_model": {
+                  "type": "string"
+                },
+                "chat_model_digest": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "embedding_revision": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                }
+              },
+              "required": [
+                "chat_model",
+                "embedding_model",
+                "chat_model_digest",
+                "embedding_revision"
+              ]
+            },
+            "hits": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/hit"
+              }
+            },
+            "used_context_chunk_ids": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "uniqueItems": true
+            },
+            "claim_level_usage": {
+              "const": "not_observed"
+            }
+          },
+          "required": [
+            "schema_version",
+            "status",
+            "k",
+            "provenance",
+            "hits",
+            "used_context_chunk_ids",
+            "claim_level_usage"
+          ]
+        }
+      },
+      "required": [
+        "response_id",
+        "created_at",
+        "trace"
+      ],
+      "additionalProperties": false
+    },
+    "verdict": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "response_id": {
+          "type": "string"
+        },
+        "response_version": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "correctness": {
+          "enum": [
+            "correct",
+            "partially_correct",
+            "incorrect"
+          ]
+        },
+        "error_bucket": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "rationale": {
+          "type": "string",
+          "minLength": 1
+        },
+        "evidence": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "actor": {
+          "const": "Manufacturing Engineer"
+        },
+        "created_at": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "response_id",
+        "response_version",
+        "correctness",
+        "error_bucket",
+        "rationale",
+        "evidence",
+        "actor",
+        "created_at"
+      ],
+      "additionalProperties": false
+    },
+    "selection": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "response_id": {
+          "type": "string"
+        },
+        "reason": {
+          "type": "string"
+        },
+        "policy_version": {
+          "type": "string"
+        },
+        "draw": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "rating_version": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "created_at": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "response_id",
+        "reason",
+        "policy_version",
+        "draw",
+        "rating_version",
+        "created_at"
+      ],
+      "additionalProperties": false
+    },
+    "evaluation": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "created_at": {
+          "type": "string"
+        },
+        "report": {
+          "type": "object",
+          "properties": {
+            "mode": {
+              "const": "chroma_retrieval"
+            },
+            "fixture_sha256": {
+              "type": "string"
+            },
+            "recall_at_k": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "k": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "N": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "corpus_fingerprint": {
+              "type": "string"
+            },
+            "results": {
+              "type": "array",
+              "items": {
+                "type": "object"
+              }
+            },
+            "provenance": {
+              "type": "object"
+            }
+          },
+          "required": [
+            "mode",
+            "fixture_sha256",
+            "recall_at_k",
+            "k",
+            "N",
+            "corpus_fingerprint",
+            "results",
+            "provenance"
+          ]
+        }
+      },
+      "required": [
+        "id",
+        "created_at",
+        "report"
+      ],
+      "additionalProperties": false
+    },
+    "change": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "plan": {
+          "type": "object"
+        },
+        "state": {
+          "enum": [
+            "proposed",
+            "applying",
+            "applied",
+            "failed"
+          ]
+        },
+        "created_at": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "plan",
+        "state",
+        "created_at"
+      ],
+      "additionalProperties": false
+    },
+    "change_event": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "change_id": {
+          "type": "string"
+        },
+        "action": {
+          "type": "string"
+        },
+        "actor": {
+          "type": "string"
+        },
+        "data": {
+          "type": "object"
+        },
+        "created_at": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "change_id",
+        "action",
+        "actor",
+        "data",
+        "created_at"
+      ],
+      "additionalProperties": false
+    },
+    "metrics": {
+      "type": "object",
+      "properties": {
+        "cohort": {
+          "const": "pilot-v1"
+        },
+        "N_responses": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "legacy_or_nonpilot_responses": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "satisfaction": {
+          "type": "object",
+          "properties": {
+            "N": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "mean_rating": {
+              "type": [
+                "number",
+                "null"
+              ],
+              "minimum": 1,
+              "maximum": 5
+            }
+          },
+          "required": [
+            "N",
+            "mean_rating"
+          ],
+          "additionalProperties": false
+        },
+        "expert_correctness": {
+          "type": "object",
+          "properties": {
+            "N_reviewed": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "counts": {
+              "type": "object",
+              "properties": {
+                "correct": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "partially_correct": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "incorrect": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              },
+              "required": [
+                "correct",
+                "partially_correct",
+                "incorrect"
+              ],
+              "additionalProperties": false
+            },
+            "correct_fraction": {
+              "type": [
+                "number",
+                "null"
+              ],
+              "minimum": 0,
+              "maximum": 1
+            },
+            "coverage": {
+              "type": [
+                "number",
+                "null"
+              ],
+              "minimum": 0,
+              "maximum": 1
+            },
+            "scope": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "N_reviewed",
+            "counts",
+            "correct_fraction",
+            "coverage",
+            "scope"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "cohort",
+        "N_responses",
+        "legacy_or_nonpilot_responses",
+        "satisfaction",
+        "expert_correctness"
+      ],
+      "additionalProperties": false
+    }
+  }
+}

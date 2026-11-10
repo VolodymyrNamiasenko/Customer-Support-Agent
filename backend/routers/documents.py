@@ -1,20 +1,22 @@
 """Document ingestion with bounded uploads and serialized mutations."""
 import hashlib
 from datetime import datetime, timezone
-from fastapi import APIRouter, File, UploadFile, HTTPException, Request
+from fastapi import APIRouter, File, UploadFile, HTTPException, Request, Query
 
 from backend.config import ALLOWED_EXTENSIONS, UPLOAD_DIR
 from backend.models.schemas import DocumentListResponse, UploadResponse
 from backend.services.document_store import load_registry, upsert_document, remove_document
 from backend.services.ingestion import extract_text, chunk_text, build_chunk_ids
 from backend.services.file_safety import upload_path
+from backend.services.retrieval_trace import corpus_fingerprint
+from backend.routers.reviews import store, run
 
 router = APIRouter()
 MAX_UPLOAD_BYTES = 20 * 1024 * 1024
 
 
 @router.post("/upload", response_model=UploadResponse, status_code=201)
-async def upload_document(request: Request, file: UploadFile = File(...)):
+async def upload_document(request: Request, file: UploadFile = File(...), change_id: str | None = Query(None)):
     try:
         path = upload_path(UPLOAD_DIR, file.filename)
     except ValueError as exc:
@@ -38,6 +40,12 @@ async def upload_document(request: Request, file: UploadFile = File(...)):
         path.parent.mkdir(parents=True, exist_ok=True)
         if path.exists():
             raise HTTPException(status_code=409, detail="An unregistered file already uses this name.")
+        governed = getattr(request.app.state, "pilot_mode", False)
+        if governed:
+            if not change_id:
+                raise HTTPException(409, "Pilot corpus changes require an expert verdict and an evaluated change ID")
+            run(lambda: store(request).start_corpus_change(change_id, "upload", file.filename, file_hash,
+                                                         corpus_fingerprint(vectorstore)))
         ids = []
         try:
             with path.open("xb") as handle:
@@ -62,12 +70,17 @@ async def upload_document(request: Request, file: UploadFile = File(...)):
                 "chunk_ids": ids,
                 "status": "indexed",
             })
+            if governed:
+                run(lambda: store(request).finish_corpus_change(change_id, corpus_fingerprint(vectorstore)))
         except Exception:
             try:
                 if ids:
                     vectorstore.delete(ids=ids)
             finally:
                 path.unlink(missing_ok=True)
+                remove_document(file.filename)
+                if governed:
+                    store(request).finish_corpus_change(change_id, corpus_fingerprint(vectorstore), failed=True)
             raise
     return {
         "status": "success", "filename": file.filename,
@@ -96,7 +109,7 @@ def list_documents():
 
 
 @router.delete("/{filename}")
-def delete_document(request: Request, filename: str):
+def delete_document(request: Request, filename: str, change_id: str | None = Query(None)):
     try:
         path = upload_path(UPLOAD_DIR, filename)
     except ValueError as exc:
@@ -105,9 +118,35 @@ def delete_document(request: Request, filename: str):
         entry = load_registry().documents.get(filename)
         if not entry:
             raise HTTPException(status_code=404, detail="Document not found.")
-        if entry.get("chunk_ids"):
-            request.app.state.vectorstore.delete(ids=entry["chunk_ids"])
-        # Do not trust absolute paths in legacy registry entries.
-        path.unlink(missing_ok=True)
-        remove_document(filename)
+        vector = request.app.state.vectorstore
+        governed = getattr(request.app.state, "pilot_mode", False)
+        if governed:
+            if not change_id:
+                raise HTTPException(409, "Pilot corpus changes require an expert verdict and an evaluated change ID")
+            backup = vector._collection.get(ids=entry.get("chunk_ids", []), include=["documents", "metadatas", "embeddings"])
+            file_backup = path.read_bytes() if path.exists() else None
+            plan = run(lambda: store(request).start_corpus_change(change_id, "delete", filename, None,
+                                                                corpus_fingerprint(vector)))
+        try:
+            if entry.get("chunk_ids"):
+                vector.delete(ids=entry["chunk_ids"])
+            if governed:
+                fingerprint = corpus_fingerprint(vector)
+                # Validate before removing the file/registry; failure restores vectors.
+                if fingerprint != plan["after_fingerprint"]:
+                    raise HTTPException(409, "Deletion differs from evaluated candidate")
+            path.unlink(missing_ok=True)
+            remove_document(filename)
+            if governed:
+                store(request).finish_corpus_change(change_id, fingerprint)
+        except Exception:
+            if governed:
+                if backup["ids"]:
+                    vector._collection.upsert(ids=backup["ids"], documents=backup["documents"],
+                                              metadatas=backup["metadatas"], embeddings=backup["embeddings"])
+                if file_backup is not None:
+                    path.write_bytes(file_backup)
+                upsert_document(filename, entry)
+                store(request).finish_corpus_change(change_id, corpus_fingerprint(vector), failed=True)
+            raise
     return {"status": "deleted"}

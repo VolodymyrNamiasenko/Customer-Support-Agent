@@ -6,13 +6,15 @@ import uuid
 from contextlib import closing
 from datetime import UTC, datetime
 from pathlib import Path
+from backend.services.pilot import PilotReviewMixin
+from backend.services.corpus_governance import CorpusGovernanceMixin
 
 
 class ReviewConflict(ValueError):
     pass
 
 
-class ReviewStore:
+class ReviewStore(PilotReviewMixin, CorpusGovernanceMixin):
     def __init__(self, path):
         self.path = Path(path)
         self.path.parent.mkdir(parents=True, exist_ok=True)
@@ -33,6 +35,7 @@ class ReviewStore:
                 CREATE INDEX IF NOT EXISTS review_status ON responses(status, created_at);
             """)
         self.path.chmod(0o600)
+        self.migrate_pilot()
 
     def connect(self):
         db = sqlite3.connect(str(self.path), timeout=10)
@@ -80,10 +83,16 @@ class ReviewStore:
             result["events"] = [
                 dict(r)
                 for r in db.execute(
-                    "SELECT action, actor, note, version, created_at FROM review_events WHERE response_id=? ORDER BY id",
+                    "SELECT id, action, actor, note, version, created_at, data FROM review_events WHERE response_id=? ORDER BY id",
                     (identifier,),
                 )
             ]
+            for event in result["events"]:
+                event["data"] = json.loads(event["data"])
+                if event["action"].startswith("rated:"):
+                    event["actor"] = "anonymous_customer"
+            trace = db.execute("SELECT trace FROM retrieval_traces WHERE response_id=?", (identifier,)).fetchone()
+            result["retrieval_trace"] = json.loads(trace[0]) if trace else None
             return result
 
     def list(self, status=None, limit=25, offset=0):
@@ -104,6 +113,10 @@ class ReviewStore:
             }
 
     def update(self, identifier, version, actor, note, *, decision=None, rating=None):
+        if decision is not None and rating is not None:
+            raise ValueError("Decision and satisfaction rating are separate actions")
+        if rating is not None:
+            return self.rate_anonymously(identifier, version, rating, note)
         if decision not in (None, "approved", "rejected"):
             raise ValueError("Invalid review decision")
         if rating is not None and (type(rating) is not int or not 1 <= rating <= 5):
@@ -123,6 +136,8 @@ class ReviewStore:
                 )
             payload = json.loads(row["payload"])
             if decision == "approved" and (
+                row["generation_state"] not in ("legacy", "completed") or
+                row["correctness"] in ("partially_correct", "incorrect") or
                 not payload.get("sources") or not payload.get(
                     "hallucination_guard", {}
                 ).get("is_valid")

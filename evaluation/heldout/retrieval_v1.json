@@ -1,0 +1,12 @@
+{
+  "version": "synthetic-retrieval-heldout-v1",
+  "split": "heldout",
+  "k": 3,
+  "scope": "Frozen synthetic retrieval regression; not client-pilot accuracy",
+  "cases": [
+    {"id": "h01", "question": "Where is the calibration certificate for the fictional torque wrench stored?", "relevant_ids": ["holdout-calibration"]},
+    {"id": "h02", "question": "Who reviews a synthetic furnace temperature exception before restart?", "relevant_ids": ["holdout-furnace"]},
+    {"id": "h03", "question": "Which two records accompany the fictional batch release?", "relevant_ids": ["holdout-traveler", "holdout-analysis"]},
+    {"id": "h04", "question": "How often is the fictional G7 gauge inspected?", "relevant_ids": ["holdout-gauge"]}
+  ]
+}

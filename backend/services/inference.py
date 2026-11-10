@@ -2,6 +2,9 @@ import os
 import json
 from typing import Any, Dict, List
 
+# Initialize NumPy before DSPy's lazy-import shim; otherwise a subsequent Chroma
+# import can encounter a partially initialized NumPy module in standalone routes/tests.
+import numpy  # noqa: F401
 import dspy
 
 from backend.config import MODEL_NAME, OLLAMA_BASE_URL, OPTIMIZED_PROGRAM_PATH
